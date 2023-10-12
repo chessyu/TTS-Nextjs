@@ -1,22 +1,37 @@
 {
-  "name": "my-app",
+  "name": "tts-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 5021",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "react": "^18",
-    "react-dom": "^18",
-    "next": "13.5.4"
+    "@types/node": "20.6.0",
+    "@types/react": "18.2.21",
+    "@types/react-dom": "18.2.7",
+    "@xenova/transformers": "^2.6.1",
+    "ahooks": "^3.7.8",
+    "antd": "^5.9.0",
+    "baidu-aip-sdk": "^4.16.13",
+    "bcryptjs": "^2.4.3",
+    "joi": "^17.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.1.0",
+    "mongoose": "^7.6.1",
+    "next": "13.4.19",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^6.15.0",
+    "tesseract.js": "^4.1.2",
+    "typescript": "5.2.2",
+    "zustand": "^4.4.1"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/bcryptjs": "^2.4.4",
+    "@types/jsonwebtoken": "^9.0.3",
+    "microsoft-cognitiveservices-speech-sdk": "^1.32.0"
   }
 }

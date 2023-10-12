@@ -1,0 +1,29 @@
+.main{
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: auto;
+}
+.continar{
+    min-width: 750px;
+    min-height: 480px;
+    max-width: 1200px;
+    overflow: hidden;
+    box-sizing: border-box;
+    width: var(--max-width);
+    height: var(--max-heigth);
+    border: var(--border);
+    border-radius: 20px;
+    box-shadow: 5px 5px 20px #e1e1e1;
+    display: flex;
+    flex-direction: column;
+}
+
+.menu{
+    padding: 5px;
+}
+
+.view{
+    flex: 1;
+}

@@ -1,0 +1,10 @@
+.regist{
+    color: #1677ff;
+    font-size: 12px;
+    float: right;
+    cursor: pointer;
+}
+
+.login-form-button{
+    width: 100%;
+}

@@ -1,0 +1,26 @@
+
+.text-sty{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+}
+
+.textarea-sty{
+    flex: 1;
+    resize: unset;
+}
+
+.audio-payer{
+    padding: 5px 20px;
+    height: 90px;
+}
+
+.dropdownSty{
+    cursor: pointer;
+    color: #aaa;
+}
+
+.dropdownSty:hover{
+    opacity: .6;
+}

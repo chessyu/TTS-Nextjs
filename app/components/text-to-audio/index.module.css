@@ -1,0 +1,24 @@
+.continar{
+    height: 100%;
+    overflow: auto;
+    display: flex;
+    gap: 15px;
+}
+
+.contMenu{
+    flex: 1;
+    display: flex;
+    gap: 10px;
+}
+.tabs{
+
+}
+
+.content{
+    flex: 1;
+}
+
+.config{
+    width: 340px;
+    padding: 20px;
+}

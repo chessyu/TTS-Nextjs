@@ -1,0 +1,18 @@
+.extract{
+    height: 100%;
+    overflow: auto;
+    padding: 0 15px 15px 15px;
+}
+
+.uploadBox{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    height: 100%;
+}
+
+.uploader{
+    flex: 1;
+
+}
+
