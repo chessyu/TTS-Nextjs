@@ -1,12 +1,14 @@
 import { Button, Col, Dropdown, Input, InputNumber, MenuProps, Modal, Row, Select, Slider } from 'antd';
 import React, { useState } from 'react'
 import { Form } from 'antd';
+import { useTextToSpeech } from '@/hooks/use-text-to-speech';
 
 function AudioConfig(props:any) {
     const [form] = Form.useForm();
     const [speedValue, setSpeedValue] = useState(1)
     const [toneValue, setToneValue] = useState(1)
     const { confirm } = Modal;
+    const { plainText, getVoiceOptions } = useTextToSpeech()
   
     const onMenuClick: MenuProps['onClick'] = async (e) => {
       console.log('click', e);
@@ -37,6 +39,22 @@ function AudioConfig(props:any) {
           console.log('OK');
         },
       });
+    }
+
+    /** 生成配音 */
+    const synthesis = async () => {
+      // const result:any = await plainText({
+      //   text: 'The recommended usage is to colocate actions and states within the store (let your actions be located together with your state)',
+      //   outputFileName: 'a',
+      //   language: 'b',
+      //   voiceName: 'c',
+      //   outputFormat: 'd'
+      // })
+
+      // console.log("RRRRRRRRR", result);
+
+      const result:any = await getVoiceOptions()
+      console.log("RRRRRRR", result);
     }
   
     const items = [
@@ -116,7 +134,7 @@ function AudioConfig(props:any) {
   
         <Form.Item >
           <div style={{ display: 'flex', justifyContent: "space-between" }}>
-            <Button type="primary" > 生成配音 </Button>
+            <Button type="primary" onClick={synthesis} > 生成配音 </Button>
             <Dropdown.Button style={{ width: "unset" }} menu={{ items, onClick: onMenuClick }} onClick={saveConf}>保存当前配置</Dropdown.Button>
           </div>
         </Form.Item>
