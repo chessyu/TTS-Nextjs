@@ -19,7 +19,7 @@ export function serverApiHandler (handler: any) {
             }catch{};
 
             try{
-                await jwtMiddleware(req);
+                // await jwtMiddleware(req);
                 await paramsValidateMiddleware(req, handler[method].schema);
 
                 const responseBody = await handler[method](req, ...args);

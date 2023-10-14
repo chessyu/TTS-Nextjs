@@ -25,14 +25,14 @@ const getVoiceOptions = async () => {
     if(!SPEECH_KEY || !SPEECH_REGION) return Promise.reject("未找到 key 值")
     const result = await fetch(
         //https://eastasia.api.speech.microsoft.com/texttospeech/acc/v3.0-beta1/vcg/voices
-        // `https://${SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/voices/list`,
-        `https://${SPEECH_REGION}.api.speech.microsoft.com/texttospeech/acc/v3.0-beta1/vcg/voices`,
+        `https://${SPEECH_REGION}.tts.speech.microsoft.com/cognitiveservices/voices/list`,
+        // `https://${SPEECH_REGION}.api.speech.microsoft.com/texttospeech/acc/v3.0-beta1/vcg/voices`,
         {
             method: "GET",
             headers: {
                 "Ocp-Apim-Subscription-Key": SPEECH_KEY!
             },
-            body:JSON.stringify({"queryCondition":{"items":[{"name":"VoiceTypeList","value":"StandardVoice","operatorKind":"Contains"}]}})
+            // body:JSON.stringify({"queryCondition":{"items":[{"name":"VoiceTypeList","value":"StandardVoice","operatorKind":"Contains"}]}})
         }
     )
     const data = result.json();
