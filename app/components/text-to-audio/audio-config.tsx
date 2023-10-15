@@ -43,7 +43,6 @@ function AudioConfig(props: any) {
     const styles = voiceStyle(data[0].StyleList!);
     const voices = voiceRole(data[0].RolePlayList!);
 
-    console.log("RRRRR", styles,data[0].StyleList, voices, data[0].RolePlayList)
     setState({voiceList: data, styleList: styles, roleList: voices});
     form.setFieldsValue({
       voice: data[0].value,
@@ -58,10 +57,21 @@ function AudioConfig(props: any) {
   };
 
   // 语音
-  const languageChange = (newValue: string) => {
+  const voiceChange = (newValue: string, options:any) => {
     // const data = voiceGroup(newValue);
-    initConfig(newValue)
+    const styles = voiceStyle(options.StyleList!);
+    const voices = voiceRole(options.RolePlayList!);
+
+    setState({ styleList: styles, roleList: voices});
+    form.setFieldsValue({
+      voice: options.value,
+      style: styles?.[0]?.value,
+      role: voices?.[0]?.value
+    })
   }
+
+
+
   // 语速
   const onSpeedChange = (newValue: number) => {
     setState({ speedValue: newValue });
@@ -127,10 +137,10 @@ function AudioConfig(props: any) {
   return (
     <Form form={form} labelCol={{ span: 4 }} initialValues={{ language, speed: speedValue, tone: toneValue }} >
       <Form.Item label="语言" name="language">
-        <Select options={languages} showSearch onChange={languageChange} />
+        <Select options={languages} showSearch onChange={(value) => initConfig(value)} />
       </Form.Item>
       <Form.Item label="语音" name="voice">
-        <Select options={voiceList} />
+        <Select options={voiceList} onChange={voiceChange }/>
       </Form.Item>
       <Form.Item label="风格" name="style">
         <Select options={styleList} />
@@ -145,6 +155,7 @@ function AudioConfig(props: any) {
               min={0.1}
               max={2.5}
               step={0.01}
+              value={speedValue}
               onChange={onSpeedChange}
             />
           </Col>
@@ -153,6 +164,7 @@ function AudioConfig(props: any) {
               min={0.1}
               max={2.5}
               step={0.01}
+              value={speedValue}
               onChange={(value) => onSpeedChange(Number(value))}
             />
           </Col>

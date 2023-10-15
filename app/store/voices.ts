@@ -6717,24 +6717,26 @@ const roleDes = [
 
 /** 获取各语言的嗓音 */
 export const voiceGroup = (lang: string) => {
-    return voices.filter(item => item.Locale === lang).map(keys => ({ ...keys, label: keys.DisplayName + '-' + keys.LocalName, value: keys.Name }))
+    return voices.filter(item => item.Locale === lang).map(keys => ({ ...keys, label: keys.DisplayName + '-' + keys.LocalName + (`${keys.Gender === 'Female' ? ' (女声)': ' (男声)'}`), value: keys.Name }))
 }
 /** 获取各语种的风格 */
 export const voiceStyle = (keys: string[]=[]) => {
-    if(!keys.length) return ;
+    if(!keys.length) return [{label: "默认", value: 'default'}];
     let maps:DefaultOptionType[] = [];
     for(var i =0; i<=keys.length; i++) {
-        maps.concat(styleDes.filter(item => item.value === keys[i]))
+        maps = maps.concat(styleDes.filter(item => item.value === keys[i]))
     }
-    return maps;
+    maps.unshift({label: "默认", value: 'default'});
+    return maps
 }
 /** 获取各语种的情感 */
 export const voiceRole = (keys: string[] = [] ) => {
-    if(!keys.length) return ;
+    if(!keys.length) return [{label: "默认", value: 'default'}];
     let maps:DefaultOptionType[] = [];
     for(var i =0; i<=keys.length; i++) {
-        maps.concat(roleDes.filter(item => item.value === keys[i]))
+        maps = maps.concat(roleDes.filter(item => item.value === keys[i]))
     }
+    maps.unshift({label: "默认", value: 'default'});
     return maps;
 }
 
