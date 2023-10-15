@@ -26,7 +26,7 @@ function AudioConfig(props: any) {
   const [form] = Form.useForm();
   const [state, setState] = useSetState<initialValuesType>(initialValues);
   const { confirm } = Modal;
-  const { plainText, getVoiceOptions } = useTextToSpeech();
+  const { plainText } = useTextToSpeech();
   const {
     speedValue,
     toneValue,
@@ -100,6 +100,8 @@ function AudioConfig(props: any) {
 
   /** 生成配音 */
   const synthesis = async () => {
+    form.getFieldsValue()
+
     // const result:any = await plainText({
     //   text: 'The recommended usage is to colocate actions and states within the store (let your actions be located together with your state)',
     //   outputFileName: 'a',
@@ -110,8 +112,6 @@ function AudioConfig(props: any) {
 
     // console.log("RRRRRRRRR", result);
 
-    const result: any = await getVoiceOptions()
-    console.log("RRRRRRR", result);
   }
 
   const items = [
@@ -196,7 +196,7 @@ function AudioConfig(props: any) {
 
       <Form.Item >
         <div style={{ display: 'flex', justifyContent: "space-between" }}>
-          <Button type="primary" onClick={synthesis} > 生成配音 </Button>
+          <Button type="primary" htmlType="submit" onClick={synthesis} > 生成配音 </Button>
           <Dropdown.Button style={{ width: "unset" }} menu={{ items, onClick: onMenuClick }} onClick={saveConf}>保存当前配置</Dropdown.Button>
         </div>
       </Form.Item>

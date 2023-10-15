@@ -9,9 +9,7 @@ const textToSpeech = async (req: NextRequest) => {
     return await aiTextToSpeeck.textToSpeech(body)
 }
 
-const getVoiceOptions = async (req:NextRequest) => {
-    return aiTextToSpeeck.getVoiceOptions();
-}
+
 
 textToSpeech.schema = joi.object({
     text: joi.string().required(),
@@ -23,5 +21,4 @@ textToSpeech.schema = joi.object({
 
 module.exports = serverApiHandler({
     POST: textToSpeech,
-    GET: getVoiceOptions
 })
