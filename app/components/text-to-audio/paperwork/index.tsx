@@ -5,21 +5,23 @@ import AudioControl from '../../common/audio-control'
 import { SegmentedProps } from 'antd/lib'
 import { DownOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { TextAreaRef } from 'antd/es/input/TextArea'
+import { useTextToSpeechConfig } from '@/store/text-to-speech-config'
 
 // 文本
 function Paperwork(props:any) {
   const inputTextAreaRef = useRef<TextAreaRef>(null);
-  const [textAreaText, setTextAreaText] = useState('');
-  const [segmented, setSegmented] = useState("text")
+  // const [textAreaText, setTextAreaText] = useState('');
+  const textToSpeechConfig = useTextToSpeechConfig();
+  const { text,isSSML, blobUrl, update } = textToSpeechConfig;
   const cursorRef = useRef({
     start: 0,
     end: 0
   })
-
+  console.log("KKKKKKKKKK", textToSpeechConfig)
 
   const segmentOption: SegmentedProps["options"] = useMemo(() => [
-    { label: "纯文本", value: 'text', icon: "" },
-    { label: "SSML", value: 'ssml', icon: "" },
+    { label: "自述", value: 'text', icon: "" },
+    { label: "场景对话", value: 'ssml', icon: "" },
   ], [])
 
   const dropdownItems: MenuProps['items'] = useMemo(() => [
@@ -39,8 +41,8 @@ function Paperwork(props:any) {
   ], [])
 
   const dropSelect: MenuProps["onClick"] = ({ item, key }) => {
-    const newText = textAreaText.substring(0, cursorRef.current.start) + `((⏰=${+key * 1000}))` + textAreaText.substring(cursorRef.current.end)
-    setTextAreaText(newText);
+    const newText = text.substring(0, cursorRef.current.start) + `((⏰=${+key * 1000}))` + text.substring(cursorRef.current.end)
+    textToSpeechConfig.update((config) => config.text = newText)
   }
 
   // 取光标位置
@@ -55,17 +57,22 @@ function Paperwork(props:any) {
 
   // 切换类型
   const segmentChange: SegmentedProps["onChange"] = (value) => {
-    setSegmented(value as string)
+    update((config) => config.isSSML = value as string)
+  }
+
+  /** 文本内容变更 */
+  const textChange = (value: string) => {
+    update((config) => config.text = value)
   }
 
   return (
     <div className={styles['text-sty']}>
       <Row>
         <Col span={12}>
-          <Segmented size="small" value={segmented} options={segmentOption} onChange={segmentChange} />
+          <Segmented size="small" value={isSSML} options={segmentOption} onChange={segmentChange} />
         </Col>
         {
-          segmented === "ssml" && (
+          !(isSSML === "text") && (
             <Col span={12} style={{ textAlign: "right" }}>
               <Dropdown menu={{ items: dropdownItems, onClick: dropSelect }} trigger={['click']} className={styles.dropdownSty} >
                 <Space>
@@ -83,11 +90,13 @@ function Paperwork(props:any) {
         placeholder='请输入配音文案...'
         ref={inputTextAreaRef}
         onBlur={handleRecordCursorPosition}
-        value={textAreaText}
-        onChange={(e) => setTextAreaText(e.target.value)}
+        allowClear
+        value={text}
+        showCount
+        onChange={(e) => textChange(e.target.value)}
       />
       <div className={styles["audio-payer"]}>
-        <AudioControl />
+        <AudioControl src={ blobUrl } />
       </div>
     </div >
 

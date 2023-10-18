@@ -1,5 +1,6 @@
 import { SpeechConfigType } from "@/interface";
 import { useFetch } from "./use-fetch";
+import { arrayBufferToAudio } from "@/utils/read-file";
 
 
 type UseTextToSpeechProps = {
@@ -12,10 +13,31 @@ export const useTextToSpeech = (): UseTextToSpeechProps => {
 
 
     const plainText = async (params: SpeechConfigType) => {
-        try{
-            return await fetch.post('/api/text-to-speech/text', params)
-        }catch(error){
+        try {
+            // return await fetch.post('/api/text-to-speech/text', params);
+            const result = await fetch.post('/api/text-to-speech/text', params);
+            if (result.status === 200) {
+                const buffer = result.data;
+                const arrayBuffer = Uint8Array.from(buffer).buffer;
+                
+                console.log("接口返回：", buffer.byteLength, buffer)
+                const svlob = new Blob([arrayBuffer], { type: 'audio/wav' });
+                const url = URL.createObjectURL(svlob);
+
+                result.data = url;
+                return Promise.resolve(result);
+            }
+
+            // return 
+            // let result = await fetch.post('/api/text-to-speech/text', params)
+            // console.log("接口返回：", result)
+            // if(result.status == 200){
+            //     result.data = await arrayBufferToAudio(result.data)
+            //     return Promise.resolve(result);
+            // }
+        } catch (error) {
             console.error(error)
+            return Promise.resolve({ status: 401 })
         }
     }
 
