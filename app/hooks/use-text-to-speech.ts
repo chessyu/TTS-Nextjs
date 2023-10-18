@@ -17,11 +17,8 @@ export const useTextToSpeech = (): UseTextToSpeechProps => {
             // return await fetch.post('/api/text-to-speech/text', params);
             const result = await fetch.post('/api/text-to-speech/text', params);
             if (result.status === 200) {
-                const buffer = result.data;
-                const arrayBuffer = Uint8Array.from(buffer).buffer;
-                
-                console.log("接口返回：", buffer.byteLength, buffer)
-                const svlob = new Blob([arrayBuffer], { type: 'audio/wav' });
+                const buffer = Buffer.from(result.data.data)
+                const svlob = new Blob([buffer], { type: 'audio/wav' });
                 const url = URL.createObjectURL(svlob);
 
                 result.data = url;
