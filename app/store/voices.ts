@@ -6717,34 +6717,34 @@ const roleDes = [
 
 export const outputFormatDes = [
 
-    { label: '16Khz-32KBit(.mp3)', value: 3 },
-    { label: '16Khz-64KBit(.mp3)', value: 5 },
-    { label: '16Khz-128KBit(.mp3)', value: 4 },
-    { label: '24Khz-48KBit(.mp3)', value: 6 },
-    { label: '24Khz-96KBit(.mp3)', value: 7 },
-    { label: '24Khz-160KBit(.mp3)', value: 8 },
-    { label: '48Khz-96KBit(.mp3)', value: 21 },
-    { label: '48Khz-192KBit(.mp3)', value: 22 },
+    { label: '16Khz-32KBit(mp3)', value: 3 },
+    { label: '16Khz-64KBit(mp3)', value: 5 },
+    { label: '16Khz-128KBit(mp3)', value: 4 },
+    { label: '24Khz-48KBit(mp3)', value: 6 },
+    { label: '24Khz-96KBit(mp3)', value: 7 },
+    { label: '24Khz-160KBit(mp3)', value: 8 },
+    { label: '48Khz-96KBit(mp3)', value: 21 },
+    { label: '48Khz-192KBit(mp3)', value: 22 },
 
-    { label: '16Khz-16Bit(.wav)', value: 10 },
-    { label: '8Khz-16Bit(.wav)', value: 11 },
-    { label: '24Khz-16Bit(.wav)', value: 12 },
-    { label: '8Khz-8Bit(.wav)', value: 13 },
-    { label: '48Khz-16Bit(.wav)', value: 20 },
-    { label: '8Khz-8BitM(.wav)', value: 28 },
-    { label: '22050Hz-16Bit(.wav)', value: 34 },
-    { label: '44100Hz-16Bit(.wav)', value: 36 },
+    { label: '16Khz-16Bit(wav)', value: 10 },
+    { label: '8Khz-16Bit(wav)', value: 11 },
+    { label: '24Khz-16Bit(wav)', value: 12 },
+    { label: '8Khz-8Bit(wav)', value: 13 },
+    { label: '48Khz-16Bit(wav)', value: 20 },
+    { label: '8Khz-8BitM(wav)', value: 28 },
+    { label: '22050Hz-16Bit(wav)', value: 34 },
+    { label: '44100Hz-16Bit(wav)', value: 36 },
 
-    { label: '16Khz-16Bit(.ogg)', value: 17 },
-    { label: '24Khz-16Bit(.ogg)', value: 18 },
-    { label: '48Khz-16Bit(.ogg)', value: 23 },
+    { label: '16Khz-16Bit(ogg)', value: 17 },
+    { label: '24Khz-16Bit(ogg)', value: 18 },
+    { label: '48Khz-16Bit(ogg)', value: 23 },
 
-    { label: '16Khz-16Bit(.webm)', value: 24 },
-    { label: '24Khz-16Bit(.webm)', value: 25 },
-    { label: '24Khz-16Bit24Kbps(.webm)', value: 29 },
+    { label: '16Khz-16Bit(webm)', value: 24 },
+    { label: '24Khz-16Bit(webm)', value: 25 },
+    { label: '24Khz-16Bit24Kbps(webm)', value: 29 },
 
-    { label: '16Khz-16Bit(.silk)', value: 9 },
-    { label: '24Khz-16Bit(.silk)', value: 26 },
+    { label: '16Khz-16Bit(silk)', value: 9 },
+    { label: '24Khz-16Bit(silk)', value: 26 },
 ]
 
 /** 获取各语言的嗓音 */

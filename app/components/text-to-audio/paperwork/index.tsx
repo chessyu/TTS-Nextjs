@@ -6,18 +6,18 @@ import { SegmentedProps } from 'antd/lib'
 import { DownOutlined, FieldTimeOutlined } from '@ant-design/icons';
 import { TextAreaRef } from 'antd/es/input/TextArea'
 import { useTextToSpeechConfig } from '@/store/text-to-speech-config'
+import { SSMLTYPE } from '@/interface'
 
 // 文本
-function Paperwork(props:any) {
+function Paperwork(props: any) {
   const inputTextAreaRef = useRef<TextAreaRef>(null);
   // const [textAreaText, setTextAreaText] = useState('');
   const textToSpeechConfig = useTextToSpeechConfig();
-  const { text,isSSML, blobUrl, update } = textToSpeechConfig;
+  const { text, isSSML, blobUrl, update } = textToSpeechConfig;
   const cursorRef = useRef({
     start: 0,
     end: 0
   })
-  console.log("KKKKKKKKKK", textToSpeechConfig)
 
   const segmentOption: SegmentedProps["options"] = useMemo(() => [
     { label: "自述", value: 'text', icon: "" },
@@ -57,12 +57,17 @@ function Paperwork(props:any) {
 
   // 切换类型
   const segmentChange: SegmentedProps["onChange"] = (value) => {
-    update((config) => config.isSSML = value as string)
+    update((config) => config.isSSML = value as SSMLTYPE)
   }
 
   /** 文本内容变更 */
   const textChange = (value: string) => {
     update((config) => config.text = value)
+  }
+
+  const audioError = () => {
+    console.log('Audio 加载失败')
+    update(config => config.blobUrl = undefined);
   }
 
   return (
@@ -96,7 +101,7 @@ function Paperwork(props:any) {
         onChange={(e) => textChange(e.target.value)}
       />
       <div className={styles["audio-payer"]}>
-        <AudioControl src={ blobUrl } />
+        <AudioControl src={blobUrl} audioError={audioError} />
       </div>
     </div >
 

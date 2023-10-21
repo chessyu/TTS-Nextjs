@@ -3,13 +3,15 @@ import { IRouteItemTypes } from '../../router'
 import styles from './index.module.css'
 import { Tabs, TabsProps } from 'antd'
 import { useTabsHook } from '@/hooks/use-tabs-hook'
-import { useNavigate, Outlet } from "react-router-dom"
+import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import AudioConfig from './audio-config'
 
 
 export default function Audio({ childrenList }: { childrenList?: IRouteItemTypes[] }) {
   const navigate = useNavigate();
-  const [active, onTabChange] = useTabsHook({ defaultValue: childrenList?.[0].key as string })
+  const { pathname } = useLocation();
+  const currentPath = pathname.split('/').filter(item => item)[1];
+  const [active, onTabChange] = useTabsHook({ defaultValue: currentPath })
 
   return (
     <div className={styles.continar}>
@@ -30,10 +32,14 @@ export default function Audio({ childrenList }: { childrenList?: IRouteItemTypes
           <Outlet />
         </div>
       </div>
+      {
+        !(active === "configpage") && (
+          <div className={styles.config}>
+            <AudioConfig activeType={active!}  />
+          </div>
+        )
+      }
 
-      <div className={styles.config}>
-        <AudioConfig />
-      </div>
     </div>
   )
 }

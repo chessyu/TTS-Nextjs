@@ -31,7 +31,10 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.4",
+    "@types/file-saver": "^2.0.6",
     "@types/jsonwebtoken": "^9.0.3",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "microsoft-cognitiveservices-speech-sdk": "^1.32.0"
   }
 }

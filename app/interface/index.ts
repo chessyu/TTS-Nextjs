@@ -17,7 +17,7 @@ export type TextToSpeechType = {
 
 export type SpeechConfigType = {
     /** 是否SSML */
-    isSSML: string;
+    isSSML: SSMLTYPE;
     /** SSML/文本 */
     text: string;
     // outputFileName: string;
@@ -29,10 +29,20 @@ export type SpeechConfigType = {
     styleName?: string;
     /** 情感 */
     roleName?: string;
-    /** 生成格式 */
-    outputFormat: string;
+    /** 音质 */
+    outputFormat: number;
     /** 语速 */
     speed: number;
     /** 音调 */
     tone: number;
+    /** 是否调用默认播放 */
+    playDefault?: boolean
+}
+
+
+export enum SSMLTYPE  {
+    /** 纯文本 */
+    TEXT = "text",
+    /** ssml */
+    SSML = 'ssml'
 }

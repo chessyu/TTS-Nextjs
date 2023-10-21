@@ -81,6 +81,14 @@ export const routers: IRouteItemTypes[] = [
                             ssr: false
                         }),
                     },
+                    {
+                        label: "配置",
+                        key: "configpage",
+                        Component: dynamic(async () => (await import(/* webpackChunkName: "configpage" */ "@/components/text-to-audio/configpage")), {
+                            loading: () => (<Loading />),
+                            ssr: false
+                        }),
+                    },
                 ]
             },
             {

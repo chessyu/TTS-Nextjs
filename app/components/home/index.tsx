@@ -1,9 +1,8 @@
 import { Button, ConfigProvider, Tabs, TabsProps } from "antd"
 import styles from "./index.module.css"
-import { useNavigate, Outlet } from "react-router-dom"
+import { useNavigate, Outlet, useLocation } from "react-router-dom"
 import { useTabsHook } from "@/hooks/use-tabs-hook"
 import { IRouteItemTypes } from "@/router"
-import { basePathname } from "@/constant"
 import 'dayjs/locale/zh-cn';
 import zhCN from 'antd/locale/zh_CN';
 import Login from "../common/login"
@@ -11,7 +10,9 @@ import { useState } from "react"
 
 export default function Home({ childrenList }: { childrenList?: IRouteItemTypes[] }) {
     const navigate = useNavigate();
-    const [active, onTabChange] = useTabsHook({ defaultValue: basePathname })
+    const { pathname } = useLocation();
+    const currentPath = pathname.split('/').filter(item => item)[0];
+    const [active, onTabChange] = useTabsHook({ defaultValue:  currentPath})
     const [open, setOpen] = useState(false)
 
     return (
