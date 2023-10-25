@@ -9,6 +9,33 @@
 
 }
 
+:root {
+	--webkitScrollbarColor: #ccc;
+	--webkitScrollbarHoverColor: #aaa9a9;
+}
+
+/********************  全局滚动条美化 *********************/
+::-webkit-scrollbar {
+	width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+	background: var(--webkitScrollbarColor); 
+	border-radius: 5px; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: var(--webkitScrollbarHoverColor);
+}
+
+* {
+	scrollbar-width: 8px;
+	scrollbar-base-color: var(--webkitScrollbarColor);
+	scrollbar-track-color: var(--webkitScrollbarColor);
+	scrollbar-arrow-color: var(--webkitScrollbarColor);
+}
+
+
 
 
 * {
@@ -421,6 +448,9 @@ template {
   display: none;
 }
 
+.flex-1{
+  flex: 1;
+}
 
 
 /* 重写 antd 样式 */

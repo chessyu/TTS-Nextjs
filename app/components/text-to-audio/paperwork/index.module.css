@@ -7,8 +7,14 @@
 }
 
 .textarea-sty{
-    flex: 1;
-    resize: unset;
+    
+}
+.configbox{
+
+}
+.configbox:focus{
+    border:1px solid #8e8eff;
+    border-radius: 5px;
 }
 
 .audio-payer{

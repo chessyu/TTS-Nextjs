@@ -14,7 +14,7 @@ const textToSpeech = async (params: SpeechConfigType) => {
 
     // speechConfig.speechSynthesisLanguage = params.language;
     // speechConfig.speechSynthesisVoiceName = params.voiceName;
-    speechConfig.speechSynthesisOutputFormat = params.outputFormat;
+    speechConfig.speechSynthesisOutputFormat = params.quality;
 
     let audio_config = null;
     if (params.playDefault) {

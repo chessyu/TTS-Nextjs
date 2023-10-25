@@ -35,13 +35,50 @@ export const downloadAudioFile = (src: string, fileName: string) => {
     }
 }
 
-/** 随机生成进度条 */
-export const generateRandomProgress = (setPercent: React.Dispatch<React.SetStateAction<number>>) => {
-    var randomPercent = 0;
-    const timer = setInterval(() => {
-        randomPercent += Math.floor(Math.random() * 10);
-        if (randomPercent >= 95) clearInterval(timer);
-        setPercent(randomPercent);
-    }, 500);
-    return timer;
+/** 文案进行分片 */
+export const splitText = (text: string, length = 400) => {
+    const punctuation = [",", ".", "...", "?", "!", "，", "。", "？", "！", "”", "\n"];
+    const result = [];
+    let start = 0;
+    let end = length;
+    while (start < text.length) {
+        let content = text.substring(start, end);
+        let lastChar = content.charAt(content.length - 1);
+        if (!punctuation.includes(lastChar)) {
+            let lastIndex = -1;
+            for (let i = content.length - 1; i >= 0; i--) {
+                if (punctuation.includes(content.charAt(i))) {
+                    lastIndex = i;
+                    break;
+                }
+            }
+            if (lastIndex !== -1) {
+                content = content.substring(0, lastIndex + 1);
+                end = start + lastIndex + 1;
+            } else {
+                let nextChar = text.charAt(end);
+                if (punctuation.includes(nextChar)) {
+                    content = content + nextChar;
+                    end++;
+                }
+            }
+        }
+        result.push({
+            buffer: Array.from(content),
+            content: content,
+            start: start,
+            end: end
+        });
+        start = end;
+        end += length;
+    }
+    return result;
 }
+
+
+/**
+ * 随机生成 11 位字符串
+ */
+export const randomStr = () => {
+    return Math.random().toString(36).substring(2);
+};

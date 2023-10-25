@@ -11,7 +11,7 @@ export default function Audio({ childrenList }: { childrenList?: IRouteItemTypes
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const currentPath = pathname.split('/').filter(item => item)[1];
-  const [active, onTabChange] = useTabsHook({ defaultValue: currentPath })
+  const [active, onTabChange] = useTabsHook({ defaultValue: currentPath || childrenList?.[0].key as string })
 
   return (
     <div className={styles.continar}>

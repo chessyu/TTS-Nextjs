@@ -1,12 +1,13 @@
 import { Button, Col, Dropdown, Input, InputNumber, MenuProps, Modal, Row, Select, SelectProps, Slider, message } from 'antd';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Form } from 'antd';
 import { useTextToSpeech } from '@/hooks/use-text-to-speech';
 import { languages, voiceGroup, voiceStyle, voiceRole, outputFormatDes } from '@/store';
 import { useSetState } from 'ahooks';
-import { useTextToSpeechConfig } from '@/store/text-to-speech-config';
+import { CustomConfigType, useTextToSpeechConfig } from '@/store/text-to-speech-config';
 import { PlayCircleOutlined } from '@ant-design/icons'
 import { SSMLTYPE } from '@/interface';
+import { randomStr } from '@/utils/common-methods';
 
 type AudioConfigPropsType = {
   activeType: string;
@@ -28,8 +29,8 @@ const initialValues = {
 
 function AudioConfig(props: AudioConfigPropsType) {
   const [form] = Form.useForm();
-  const { text, language, isSSML, speed, tone, blobUrl, audioConfig, update } = useTextToSpeechConfig();
-
+  const [titleForm] = Form.useForm();
+  const { text, language, isSSML, speed, tone, blobUrl, audioConfig, quality, update } = useTextToSpeechConfig();
   const [state, setState] = useSetState<initialValuesType>(initialValues);
   const { confirm } = Modal;
   const { plainText } = useTextToSpeech();
@@ -40,34 +41,46 @@ function AudioConfig(props: AudioConfigPropsType) {
     loading
   } = state;
 
-
-  const initConfig = (initLang = language) => {
+  /** 初始化配置项 */
+  const initConfig = (initLang = language, switchObj?: any) => {
     const data = voiceGroup(initLang!);
     if (!data.length) return;
-    const styles = voiceStyle(data[0].StyleList!);
-    const voices = voiceRole(data[0].RolePlayList!);
+    let filterData: any = {};
+    if (switchObj?.voiceName) {
+      filterData = data.find(item => item.Name === switchObj.voiceName)
+    }
+    const styles = voiceStyle(switchObj ? filterData?.StyleList : data[0].StyleList!);
+    const voices = voiceRole(switchObj ? filterData?.RolePlayList : data[0].RolePlayList!);
 
     setState({ voiceList: data, styleList: styles, roleList: voices });
     form.setFieldsValue({
-      voice: data[0].value,
-      style: styles?.[0]?.value,
-      role: voices?.[0]?.value
+      language: switchObj?.language ?? initLang,
+      voice: switchObj?.voiceName ?? data[0].value,
+      style: switchObj?.styleName ?? styles?.[0]?.value,
+      role: switchObj?.roleName ?? voices?.[0]?.value,
+      quality: switchObj?.quality ?? quality,
+      speed: switchObj?.speed ?? speed,
+      tone: switchObj?.tone ?? tone
     })
     update((config) => {
-      config.voiceName = data[0].value;
-      config.styleName = styles?.[0]?.value as string;
-      config.roleName = voices?.[0]?.value as string;
+      config.language = switchObj?.language ?? initLang,
+        config.voiceName = switchObj?.voiceName ?? data[0].value;
+      config.styleName = switchObj?.styleName ?? styles?.[0]?.value as string;
+      config.roleName = switchObj?.roleName ?? voices?.[0]?.value as string;
+      config.quality = switchObj?.quality ?? quality,
+        config.speed = switchObj?.speed ?? speed,
+        config.tone = switchObj?.tone ?? tone
     })
   }
 
+  /** 选择某一自定义配置 */
   const onMenuClick: MenuProps['onClick'] = async (e) => {
-    console.log('click', e);
-    // imageToText()
+    const current = audioConfig.customConfig.filter(item => item.id === e.key);
+    if (current.length) initConfig(current[0].data.language, current[0].data)
   };
 
   // 语音
   const voiceChange = (newValue: string, options: any) => {
-    console.log("MMMMMMMM", newValue, options)
     const styles = voiceStyle(options.StyleList!);
     const voices = voiceRole(options.RolePlayList!);
 
@@ -100,12 +113,31 @@ function AudioConfig(props: AudioConfigPropsType) {
       title: '确定要保存此份配置吗？',
       icon: null,
       content: <>
-        <Form.Item label="自定义配置名称">
-          <Input />
-        </Form.Item>
+        <Form form={titleForm}>
+          <Form.Item name="name" label="配置名称" rules={[{ required: true, message: "必填项" }]}>
+            <Input />
+          </Form.Item>
+        </Form>
       </>,
       onOk() {
-        console.log('OK');
+        titleForm.validateFields()
+          .then(values => {
+            update(config => config.audioConfig.customConfig = config.audioConfig.customConfig.concat([{
+              id: randomStr(),
+              name: values.name,
+              data: {
+                language: config.language,
+                voiceName: config.voiceName,
+                styleName: config.styleName,
+                roleName: config.roleName,
+                quality: config.quality,
+                speed: config.speed,
+                tone: config.tone
+              }
+            }]))
+            message.success("配置保存成功")
+            titleForm.resetFields();
+          }).catch(error => console.log(error))
       },
     });
   }
@@ -127,7 +159,7 @@ function AudioConfig(props: AudioConfigPropsType) {
       voiceName: formData.voice,
       styleName: formData.style,
       roleName: formData.role,
-      outputFormat: formData.exportFormmat,
+      quality: formData.quality,
       speed: speed,
       tone: tone,
       isSSML
@@ -136,41 +168,58 @@ function AudioConfig(props: AudioConfigPropsType) {
     if (result.status == 200) {
       update(config => config.blobUrl = result.data);
       message.success("语音已生成!")
+    } else {
+      message.error(result.message)
     }
 
     setState({ loading: false })
   }
 
-  const items = [
-    {
-      key: '1',
-      label: '1st item',
-    },
-    {
-      key: '2',
-      label: '2nd item',
-    },
-    {
-      key: '3',
-      label: '3rd item',
-    },
-  ];
+  const items = audioConfig.customConfig.map(item => ({
+    key: item.id,
+    label: (<div style={{ display: "flex", justifyContent: "space-between" }}>
+      <span>{item.name}</span>
+      <span style={{ padding: "0 5px" }} onClick={(e) => configPayAuio(e, item.data)}> <PlayCircleOutlined style={{ color: '#3c8308' }} /> </span>
+    </div>)
+  }));
 
+  /** 配置项的声音试听 */
+  const configPayAuio = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, item: CustomConfigType["data"]) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const result = await plainText({
+      text: audioConfig.audition || "这声音是来自配置项",
+      language: item.language,
+      voiceName: item.voiceName,
+      styleName: item.styleName,
+      roleName: item.roleName,
+      quality: item.quality,
+      speed: item.speed,
+      tone: item.tone,
+      isSSML: SSMLTYPE.TEXT,
+      playDefault: true
+    })
+    if (result !== 200) message.error(result.message)
+  }
+
+  /** 播放试听音频 */
   const payAudio = async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>, item: any) => {
     e.preventDefault();
     e.stopPropagation();
-    await plainText({
+    const result = await plainText({
       text: audioConfig.audition || "这声音是来自" + item.LocalName,
       language: item.Locale,
       voiceName: item.Name,
       styleName: "Default",
       roleName: "Default",
-      outputFormat: 3,
+      quality: 3,
       speed: 1,
       tone: 1,
       isSSML: SSMLTYPE.TEXT,
       playDefault: true
     })
+
+    if (result !== 200) message.error(result.message)
   }
 
   useEffect(() => {
@@ -179,7 +228,7 @@ function AudioConfig(props: AudioConfigPropsType) {
 
 
   return (
-    <Form form={form} labelCol={{ span: 4 }} initialValues={{ language, speed, tone, exportFormmat: 3 }} >
+    <Form form={form} labelCol={{ span: 4 }} initialValues={{ language, speed, tone, quality: quality }} >
       <Form.Item label="语言" name="language">
         <Select options={languages} showSearch onChange={(value) => initConfig(value)} />
       </Form.Item>
@@ -196,12 +245,12 @@ function AudioConfig(props: AudioConfigPropsType) {
         />
       </Form.Item>
       <Form.Item label="风格" name="style">
-        <Select options={styleList} />
+        <Select options={styleList} onChange={(newValue) => update(config => config.styleName = newValue)} />
       </Form.Item>
-      <Form.Item label="情感" name="role">
-        <Select options={roleList} />
+      <Form.Item label="角色" name="role">
+        <Select options={roleList} onChange={(newValue) => update(config => config.roleName = newValue)} />
       </Form.Item>
-      <Form.Item label="音质" name="exportFormmat">
+      <Form.Item label="音质" name="quality">
         <Select options={outputFormatDes} />
       </Form.Item>
       <Form.Item label="语速" name="speed">

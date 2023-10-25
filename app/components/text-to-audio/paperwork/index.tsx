@@ -11,7 +11,6 @@ import { SSMLTYPE } from '@/interface'
 // 文本
 function Paperwork(props: any) {
   const inputTextAreaRef = useRef<TextAreaRef>(null);
-  // const [textAreaText, setTextAreaText] = useState('');
   const textToSpeechConfig = useTextToSpeechConfig();
   const { text, isSSML, blobUrl, update } = textToSpeechConfig;
   const cursorRef = useRef({
@@ -20,8 +19,8 @@ function Paperwork(props: any) {
   })
 
   const segmentOption: SegmentedProps["options"] = useMemo(() => [
-    { label: "自述", value: 'text', icon: "" },
-    { label: "场景对话", value: 'ssml', icon: "" },
+    { label: "自述", value: SSMLTYPE.TEXT, icon: "" },
+    { label: "场景对话", value: SSMLTYPE.SSML, icon: "" },
   ], [])
 
   const dropdownItems: MenuProps['items'] = useMemo(() => [
@@ -70,6 +69,19 @@ function Paperwork(props: any) {
     update(config => config.blobUrl = undefined);
   }
 
+  const onPaste = (event: React.ClipboardEvent<HTMLDivElement>) => {
+    event.preventDefault();
+
+    let paste = (event.clipboardData || window.Clipboard).getData("text");
+    paste = paste.toUpperCase();
+
+    const selection = window.getSelection();
+    if (!selection?.rangeCount) return;
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(paste));
+    selection.collapseToEnd();
+  }
+
   return (
     <div className={styles['text-sty']}>
       <Row>
@@ -77,7 +89,7 @@ function Paperwork(props: any) {
           <Segmented size="small" value={isSSML} options={segmentOption} onChange={segmentChange} />
         </Col>
         {
-          !(isSSML === "text") && (
+          !(isSSML === SSMLTYPE.TEXT) && (
             <Col span={12} style={{ textAlign: "right" }}>
               <Dropdown menu={{ items: dropdownItems, onClick: dropSelect }} trigger={['click']} className={styles.dropdownSty} >
                 <Space>
@@ -91,15 +103,28 @@ function Paperwork(props: any) {
         }
 
       </Row>
-      <Input.TextArea className={styles["textarea-sty"]}
-        placeholder='请输入配音文案...'
-        ref={inputTextAreaRef}
-        onBlur={handleRecordCursorPosition}
-        allowClear
-        value={text}
-        showCount
-        onChange={(e) => textChange(e.target.value)}
-      />
+      {
+        isSSML === SSMLTYPE.TEXT && (
+          <Input.TextArea className={`${styles["textarea-sty"]} flex-1`}
+            style={{ resize: "none" }}
+            placeholder='请输入配音文案...'
+            ref={inputTextAreaRef}
+            onBlur={handleRecordCursorPosition}
+            allowClear
+            value={text}
+            showCount
+            onChange={(e) => textChange(e.target.value)}
+          />
+        )
+      }
+      {
+        isSSML === SSMLTYPE.SSML && (
+          <div onPaste={(e) => onPaste(e)} className={`${styles["configbox"]} flex-1`} >
+
+          </div>
+        )
+      }
+
       <div className={styles["audio-payer"]}>
         <AudioControl src={blobUrl} audioError={audioError} />
       </div>

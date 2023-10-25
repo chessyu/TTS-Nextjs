@@ -30,7 +30,7 @@ export type SpeechConfigType = {
     /** 情感 */
     roleName?: string;
     /** 音质 */
-    outputFormat: number;
+    quality: number;
     /** 语速 */
     speed: number;
     /** 音调 */

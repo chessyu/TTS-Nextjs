@@ -1,26 +1,25 @@
 import { Button, Popconfirm, Progress, Space, Table, Upload, UploadProps, message } from 'antd'
-import React, { useState } from 'react'
-import { InboxOutlined, CloudDownloadOutlined, QuestionCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+import React, { useEffect, useState } from 'react'
+import { CloudDownloadOutlined, QuestionCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { ColumnsType } from 'antd/es/table';
-import { readTxtContent } from '@/utils/read-file';
 import AudioControl from '../../common/audio-control';
-import { downloadAudioFile, generateRandomProgress, zipFileByBlobUrl } from '@/utils/common-methods';
+import { downloadAudioFile, zipFileByBlobUrl } from '@/utils/common-methods';
 import { useTextToSpeech } from '@/hooks/use-text-to-speech';
 import { useTextToSpeechConfig } from '@/store/text-to-speech-config';
+import UploadFilePage from '@/components/common/upload-file-page';
 
-type TableDataType = {
+export type TableDataType = {
   id: string;
   fileName: string;
-  blobUrl: string;
+  blobUrl?: string;
   content: string;
   status: "active" | "normal" | "exception" | "success"
 }
 
 function BatchPaperwork(props: any) {
-  const MAXFILE = 5;
   const [selectedRow, setSelectedRow] = useState<TableDataType[]>([]);
   const [tableData, setTableData] = useState<TableDataType[]>([]);
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState<any>({})
   const { plainText } = useTextToSpeech()
   const { getSpeechParams, update, audioConfig } = useTextToSpeechConfig();
 
@@ -40,8 +39,7 @@ function BatchPaperwork(props: any) {
       render: (_, record) => {
         return (<>
           {record.blobUrl && <AudioControl showDownBtn={false} style={{ height: 30 }} src={record.blobUrl} autoPlay={false} />}
-          {!record.blobUrl && <Progress size="small" percent={selectedRow.filter(keys => keys.id === record.id).length && progress} status={record.status ?? 'active'} />}
-
+          {!record.blobUrl && <Progress size="small" percent={selectedRow.filter(keys => keys.id === record.id).length && progress[record.id] } status={record.status ?? "active"} />}
         </>)
       }
     },
@@ -63,39 +61,14 @@ function BatchPaperwork(props: any) {
   // 列表勾选回调
   const onSelectChange = (newSelectedRowKeys: React.Key[], newSelectedRow: TableDataType[]) => {
     setSelectedRow(newSelectedRow);
-    setProgress(0);
+    setProgress({});
   };
 
   // 清空列表
   const tableClear = () => {
     setTableData([]);
     setSelectedRow([]);
-    setProgress(0);
-  }
-
-  // 上传文件变化
-  const fileChange: UploadProps["onChange"] = async (info) => {
-    if (MAXFILE < (info.fileList.length + tableData.length)) {
-      message.error(`最多上传 ${MAXFILE} 个文件`);
-      return
-    };
-    let dataList = [];
-    for (let file of info.fileList) {
-      const text = await readTxtContent(file.originFileObj as unknown as File);
-      (file as any)["content"] = text;
-      dataList.push({ ...file, id: file.uid, fileName: file.name, blobUrl: undefined, status: "active" })
-    }
-    setTableData(dataList as unknown as TableDataType[])
-
-  }
-
-  // 文件拖拽
-  const fileDrop: UploadProps["onDrop"] = (e: any) => {
-    for (var item of e.dataTransfer.files) {
-      if (item.type !== "text/plain") {
-        message.error("仅支持上传 .txt 文件")
-      }
-    }
+    setProgress({});
   }
 
   // 删除某行
@@ -105,17 +78,31 @@ function BatchPaperwork(props: any) {
 
   /** 生成配音 */
   const generate = async () => {
-    const timer = generateRandomProgress(setProgress)
+    await new Promise(resolve => {
+      selectedRow.forEach(item => {
+        const interval = setInterval(() => {
+          setProgress((prevProgress:any) => ({
+            ...prevProgress,
+            [item.id]: (parseInt(prevProgress[item.id]) || 0) + Math.floor(Math.random() * 5),
+            [item.id+"_timer"] : interval
+          }));    
+        }, 500);
+      })
+      resolve(undefined);
+    })
     for (const item of selectedRow) {
       const result = await plainText({ ...getSpeechParams(), text: item.content });
       if (result.status === 200) {
         message.success(item.fileName + "生成配音成功!");
         await asyncWriteTableData(item.id, { blobUrl: result.data, status: "success" })
+        setProgress((prevProgress:any) => ({
+          ...prevProgress,
+          [item.id]: 100,
+        }));
       } else {
         await asyncWriteTableData(item.id, { status: 'exception' })
         message.error(item.fileName + ' ' + result.message.privErrorDetails);
       }
-      clearInterval(timer)
     }
   }
 
@@ -123,7 +110,6 @@ function BatchPaperwork(props: any) {
   const asyncWriteTableData = async (id: string, writeobj: any) => {
     await new Promise(resolve =>
       setTableData(table => {
-        setSelectedRow([]);
         return table.map((keys) =>
           keys.id === id ? { ...keys, ...writeobj } : keys
           , resolve(undefined))
@@ -134,35 +120,28 @@ function BatchPaperwork(props: any) {
   // 批量下载
   const downloadAll = async () => {
     const canDownload = selectedRow.filter(keys => keys.blobUrl)
-    if(!canDownload.length) {
+    if (!canDownload.length) {
       message.error("请勾选已配音成功的选项");
       return false;
     }
     await zipFileByBlobUrl(canDownload, audioConfig.download);
-    message.success(`下载成功条数：${canDownload.length}。${canDownload.length !== selectedRow.length ? '已过滤掉未配音的数据': ''}`)
+    message.success(`下载成功条数：${canDownload.length}。${canDownload.length !== selectedRow.length ? '已过滤掉未配音的数据' : ''}`)
     setSelectedRow([])
   }
+
+  useEffect(() => {
+    selectedRow.forEach(item => {
+      if ((progress[item.id]) >= 100) {
+        clearInterval(progress[item.id+"_timer"]);
+        setSelectedRow(selectedRow => selectedRow.filter(keys => keys.id !== item.id));
+      }
+    })
+  },[progress])
 
   return (
     <div style={{ height: '100%', paddingBottom: 15 }}>
       {
-        !tableData.length && (
-          <Upload.Dragger
-            accept={'.txt'}
-            beforeUpload={() => false}
-            multiple={true}
-            showUploadList={false}
-            onChange={fileChange}
-            onDrop={fileDrop}
-          >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined />
-            </p>
-            <p className="ant-upload-text">单击或拖拽文件进行上传</p>
-            <p className="ant-upload-hint">
-              {`仅支持上传 .txt 文件，最多可上传 ${MAXFILE} 个文件`}
-            </p>
-          </Upload.Dragger>
+        !tableData.length && ( <UploadFilePage style={{ height: '100%'}} tableData={tableData} setTableData={(data) => setTableData(data) } />
         )
       }
 
@@ -187,6 +166,7 @@ function BatchPaperwork(props: any) {
             }}
             size="small"
           />
+          { tableData.length < 5 && <UploadFilePage tableData={tableData} setTableData={(data) => setTableData(data) } /> }
         </>)
       }
     </div >

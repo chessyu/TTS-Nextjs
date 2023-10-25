@@ -6771,4 +6771,16 @@ export const voiceRole = (keys: string[] = []) => {
     maps.unshift({ label: "默认", value: 'Default' });
     return maps;
 }
-
+/** 获取语音的中文名 */
+export const getVoiceName = (lang:string, value:string) => {
+    const data = voices.filter(item => item.Locale === lang).map(keys => ({ ...keys, label: keys.DisplayName + '-' + keys.LocalName, value: keys.Name }))
+    const findObj = data.find(item => item.value === value);
+    return findObj?.label;
+}
+/** 风格/情感 转中文 */
+export const getStyleRoleName = (value:string) => {
+    if(value === 'Default') return "默认";
+    const allDes = styleDes.concat(roleDes, languages);
+    const findObj = allDes.find(item => item.value === value);
+    return findObj?.label;
+}
