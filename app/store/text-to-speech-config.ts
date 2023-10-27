@@ -1,4 +1,4 @@
-import { StroreKey } from "@/constant";
+import { StoreKey } from "@/constant";
 import { SSMLTYPE, SpeechConfigType } from "@/interface";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -74,7 +74,7 @@ export const useTextToSpeechConfig = create<TextToSpeechConfigStore>()(
             }
         }),
         {
-            name: StroreKey.TextToSpeechConfig
+            name: StoreKey.TextToSpeechConfig
         }
     )
 )

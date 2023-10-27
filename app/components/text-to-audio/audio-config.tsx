@@ -122,9 +122,13 @@ function AudioConfig(props: AudioConfigPropsType) {
       onOk() {
         titleForm.validateFields()
           .then(values => {
+            if(audioConfig.customConfig.filter(item => item.name === values.name.trim()).length) {
+              message.error("名称已存在，请换一个")
+              return false;
+            }
             update(config => config.audioConfig.customConfig = config.audioConfig.customConfig.concat([{
               id: randomStr(),
-              name: values.name,
+              name: values.name.trim(),
               data: {
                 language: config.language,
                 voiceName: config.voiceName,
@@ -199,7 +203,7 @@ function AudioConfig(props: AudioConfigPropsType) {
       isSSML: SSMLTYPE.TEXT,
       playDefault: true
     })
-    if (result !== 200) message.error(result.message)
+    if (result.status !== 200) message.error(result.message)
   }
 
   /** 播放试听音频 */
@@ -218,8 +222,7 @@ function AudioConfig(props: AudioConfigPropsType) {
       isSSML: SSMLTYPE.TEXT,
       playDefault: true
     })
-
-    if (result !== 200) message.error(result.message)
+    if (result.status !== 200) message.error(result.message)
   }
 
   useEffect(() => {

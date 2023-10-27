@@ -5,8 +5,9 @@ export enum FileTypes {
     /** video  */
     VIDEO = "video/*",
     /** audio */
-    AUDIO = "audio/*"
-
+    AUDIO = "audio/*",
+    /** txt */
+    TEXT = 'text/plain'
 } 
 
 

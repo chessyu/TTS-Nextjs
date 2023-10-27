@@ -119,14 +119,14 @@ function Paperwork(props: any) {
       }
       {
         isSSML === SSMLTYPE.SSML && (
-          <div onPaste={(e) => onPaste(e)} className={`${styles["configbox"]} flex-1`} >
-
+          <div onPaste={(e) => onPaste(e)} className={`${styles["configbox"]} flex-1`} tabIndex={1} >
+            
           </div>
         )
       }
 
       <div className={styles["audio-payer"]}>
-        <AudioControl src={blobUrl} audioError={audioError} />
+        <AudioControl src={blobUrl}  audioError={audioError} fileName={text.substring(0,8)+'... '} />
       </div>
     </div >
 

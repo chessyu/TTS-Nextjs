@@ -1,34 +1,34 @@
 import { SpeechConfigType } from "./interface"
 
-
+/** 默认路由 */
 export const basePathname = "text-to-audio"
-
+/** 成功返回参数 */
 export const RESPONSEOK = {
     status: 200,
     success: true,
     data: {},
     message: "操作成功",
 }
-
+/** 失败返回参数 */
 export const REQUESTERR = {
     status: 401,
     success: false,
     data: null,
     message: "操作失败",
 }
-
+/** 提取模块 tabs */
 export const extractTabs = [
     { label: "图片识别", value: 'image', icon: "" },
     { label: "语音识别", value: 'audio', icon: "" },
+    { label: "视频识别", value: 'video', icon: "" },
 ]
-
-export enum StroreKey {
+/** store Key */
+export enum StoreKey {
     /** 整个app状态管理 */
     AppConfig = 'app-config',
     /** 文本转语音状态 */
     TextToSpeechConfig = "text-to-speech-config",
 }
-
 /** 生成 SSML 格式 */
 export const SSMLLable = (params: SpeechConfigType) => {
     const rate = ((params.speed-1)*100).toFixed(2);

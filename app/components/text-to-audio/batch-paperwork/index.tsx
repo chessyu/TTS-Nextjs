@@ -38,7 +38,7 @@ function BatchPaperwork(props: any) {
       align: "center",
       render: (_, record) => {
         return (<>
-          {record.blobUrl && <AudioControl showDownBtn={false} style={{ height: 30 }} src={record.blobUrl} autoPlay={false} />}
+          {record.blobUrl && <AudioControl showDownBtn={false} style={{ height: 30 }} src={record.blobUrl} autoPlay={false} fileName={record.fileName} />}
           {!record.blobUrl && <Progress size="small" percent={selectedRow.filter(keys => keys.id === record.id).length && progress[record.id] } status={record.status ?? "active"} />}
         </>)
       }
