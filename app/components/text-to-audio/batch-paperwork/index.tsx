@@ -101,6 +101,10 @@ function BatchPaperwork(props: any) {
         }));
       } else {
         await asyncWriteTableData(item.id, { status: 'exception' })
+        setProgress((prevProgress: any) => ({
+          ...prevProgress,
+          [item.id]: 100,
+        }));
         message.error(item.fileName + ' ' + result.message.privErrorDetails);
       }
     }

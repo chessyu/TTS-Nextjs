@@ -10,7 +10,7 @@ type UploadFilePagePropsType = {
     maxFile?: number
     tableData: TableDataType[],
     setTableData: (data: TableDataType[]) => void;
-    fileType?: FileTypes
+    fileType?: string
 }
 
 function UploadFilePage(props: UploadFilePagePropsType) {
