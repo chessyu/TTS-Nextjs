@@ -19,6 +19,7 @@ const charachterForAudio = async (params: any) =>
         /** 设置不雅内容 */
         speechConfig.setProfanity(sdk.ProfanityOption.Masked);
         speechConfig.setProperty("SpeechServiceResponse_PostProcessingOption", "TrueText");
+        speechConfig.setProperty(sdk.PropertyId.SpeechServiceResponse_RequestSentenceBoundary, "true");
         speechConfig.speechRecognitionLanguage = "zh-CN";
 
         // speechConfig.speechRecognitionLanguage = "en-US";
@@ -46,12 +47,13 @@ const charachterForAudio = async (params: any) =>
                 console.log("完成👌🏼识别", e.result.text);
                 resolve(e.result.text)
             } else {
-                console.log("无法识别该音频");
+                console.log("识别完成:  无法识别该音频", e);
             }
         }
 
         /** 关闭 */
         speechRecognizer.canceled = (s, e) => {
+            console.log("关闭连接", e.reason)
             if (e.reason == sdk.CancellationReason.Error) {
                 console.log(`"CANCELED: ErrorCode=${e.errorCode}`);
                 console.log(`"CANCELED: ErrorDetails=${e.errorDetails}`);

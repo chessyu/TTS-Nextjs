@@ -13,6 +13,12 @@
 
 .uploader{
     flex: 1;
-
 }
 
+.console{
+    border: 1px solid #1677ff;
+    border-radius: 3px;
+    height: 100%;
+    overflow: hidden;
+    padding: 5px 10px;
+}

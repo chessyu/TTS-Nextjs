@@ -82,23 +82,6 @@ export const randomStr = () => {
     return Math.random().toString(36).substring(2);
 };
 
-/** 处理文件转流 */
-export const handleFileToStream = (fileData: File) =>
-    new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            const fileData = event.target?.result;
-            const stream = new ReadableStream({
-                start(controller) {
-                    controller.enqueue(fileData);
-                    controller.close();
-                }
-            });
-            resolve(stream);
-        };
-        reader.readAsArrayBuffer(fileData);
-    })
-
 /** 获取文件头信息并转成对应的字符串 */
 export const getFileHeader = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -128,48 +111,18 @@ export async function checkAndAddWaveFmtHeader(file: File): Promise<File> {
     const reader = new FileReader();
 
     return new Promise<File>((resolve, reject) => {
-        reader.onload = () => {
-            if (reader.result) {
-                const buffer = new Uint8Array(reader.result as ArrayBuffer);
-                const header = new DataView(buffer.buffer, 0, 4);
 
-                // 检查文件头是否包含 "RIFF" 标识
-                if (String.fromCharCode(header.getUint8(0), header.getUint8(1), header.getUint8(2), header.getUint8(3)) === "RIFF") {
-                    // 包含 RIFF WAVE fmt 头，直接返回文件
-                    resolve(file);
-                } else {
-                    // 如果不包含，添加 RIFF WAVE fmt 头
-                    const newHeader = new Uint8Array(44); // 新的头部，通常是44字节
-                    newHeader.set([82, 73, 70, 70], 0); // "RIFF"
-                    newHeader.set([36, 0, 0, 0], 4); // 文件长度（占位）
-                    newHeader.set([87, 65, 86, 69], 8); // "WAVE"
-                    newHeader.set([102, 109, 116, 32], 12); // "fmt "
-                    newHeader.set([16, 0, 0, 0], 16); // 子块大小
-                    newHeader.set([1, 0], 20); // 音频格式（PCM）
-                    newHeader.set([1, 0], 22); // 声道数
-                    newHeader.set([64, 61, 0, 0], 24); // 采样率（44100 Hz）
-                    newHeader.set([128, 62, 2, 0], 28); // 每秒字节数（176400）
-                    newHeader.set([2, 0, 16, 0], 32); // 块对齐
-                    newHeader.set([16, 0], 34); // 每样本位数
-                    newHeader.set([100, 97, 116, 97], 36); // "data"
-                    newHeader.set([0, 0, 0, 0], 40); // 数据大小（占位）
-
-
-                    // 合并新头部和文件内容
-                    const newBuffer = new Uint8Array(newHeader.length + buffer.length);
-                    newBuffer.set(newHeader, 0);
-                    newBuffer.set(buffer, newHeader.length);
-
-                    // 创建新的 Blob 对象并返回
-                    const newBlob = new Blob([newBuffer], { type: file.type });
-
-                    // 创建新的 File 对象并返回
-                    const newFile = new File([newBlob], file.name, { type: file.type });
-                    resolve(newFile);
-                }
-            } else {
-                reject(new Error("文件读取失败"));
+        reader.onload = async () => {
+            const buffer = new Uint8Array(reader.result as ArrayBuffer);
+            const header = new DataView(buffer.buffer, 0, 4);
+            if (String.fromCharCode(header.getUint8(0), header.getUint8(1), header.getUint8(2), header.getUint8(3)) === "RIFF") {
+                // 包含 RIFF WAVE fmt 头，直接返回文件
+                if (file.type === 'audio/wav') resolve(file);
+                // 其它文件格式转成 wav 
+                const transpanent = new File([reader.result as ArrayBuffer], file.name.substring(0, file.name.length - 4) + '.wav', { type: 'audio/wav' });
+                resolve(transpanent)
             }
+            resolve(convertToWav(file))
         };
 
         reader.onerror = (error) => {
@@ -179,4 +132,65 @@ export async function checkAndAddWaveFmtHeader(file: File): Promise<File> {
         // 读取文件的前4字节
         reader.readAsArrayBuffer(file);
     });
+}
+
+// 将音频格式统一转成 wav 格式
+function convertToWav(file: File): Promise<File> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = function (event) {
+            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            audioContext.decodeAudioData(event.target!.result as ArrayBuffer, function (buffer) {
+                const wavBlob = bufferToWav(buffer);
+                const wavFile = new File([wavBlob], file.name.replace(/\.[^/.]+$/, "") + ".wav", { type: "audio/wav" });
+                console.log("PPPPPPPPP", wavFile)
+                resolve(wavFile);
+            }, reject);
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function bufferToWav(buffer: AudioBuffer): Blob {
+    const wavData = new DataView(new ArrayBuffer(44 + buffer.length * 2));
+    writeString(wavData, 0, "RIFF");
+    wavData.setUint32(4, 36 + buffer.length * 2, true);
+    writeString(wavData, 8, "WAVE");
+    writeString(wavData, 12, "fmt ");
+    wavData.setUint32(16, 16, true);
+    wavData.setUint16(20, 1, true);
+    wavData.setUint16(22, 1, true);
+    wavData.setUint32(24, 44100, true);
+    wavData.setUint32(28, 44100 * 2, true);
+    wavData.setUint16(32, 2, true);
+    wavData.setUint16(34, 16, true);
+    writeString(wavData, 36, "data");
+    wavData.setUint32(40, buffer.length * 2, true);
+    floatTo16BitPCM(wavData, 44, buffer.getChannelData(0));
+    return new Blob([wavData], { type: "audio/wav" });
+}
+
+function writeString(dataView: DataView, offset: number, string: string) {
+    for (let i = 0; i < string.length; i++) {
+        dataView.setUint8(offset + i, string.charCodeAt(i));
+    }
+}
+
+function floatTo16BitPCM(output: DataView, offset: number, input: Float32Array) {
+    for (let i = 0; i < input.length; i++, offset += 2) {
+        const sample = Math.max(-1, Math.min(1, input[i]));
+        output.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+    }
+}
+
+/** 递归的去修改某些数据 */
+export const deepEditAttrs = (maps: any[] = [], objs: (item:any) => any) => {
+    if(maps instanceof Array){
+        maps.forEach((keys) => {
+            keys = {...keys, ...objs(keys)};
+            if(keys.childList && keys.childList.length) deepEditAttrs(keys.childList, objs);
+        })
+        return maps;
+    }
 }

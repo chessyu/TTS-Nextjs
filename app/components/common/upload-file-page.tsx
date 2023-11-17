@@ -2,18 +2,23 @@ import { readTxtContent } from '@/utils/read-file';
 import { Upload, UploadFile, UploadProps, message } from 'antd'
 import React, { CSSProperties, useState } from 'react'
 import { InboxOutlined } from '@ant-design/icons';
-import { TableDataType } from '../text-to-audio/batch-paperwork';
 import { FileTypes } from '@/interface';
 
-type UploadFilePagePropsType = {
+type BaseAttribute = {
+    id: string;
+    fileName: string;
+    blobUrl?: string
+}
+
+type UploadFilePagePropsType<T> = {
     style?: CSSProperties
     maxFile?: number
-    tableData: TableDataType[],
-    setTableData: (data: TableDataType[]) => void;
+    tableData: T[],
+    setTableData: (data: T[]) => void;
     fileType?: string
 }
 
-function UploadFilePage(props: UploadFilePagePropsType) {
+function UploadFilePage<T extends BaseAttribute>(props: UploadFilePagePropsType<T>) {
     const MAXFILE = props.maxFile ?? 5;
     const [fileList, setFileList] = useState<UploadFile[]>()
     const FILETYPE = props.fileType ?? FileTypes.TEXT;
@@ -24,13 +29,26 @@ function UploadFilePage(props: UploadFilePagePropsType) {
 
     // 上传文件变化
     const fileChange: UploadProps["onChange"] = async (info) => {
-        let dataList: TableDataType[] = [];
+        let dataList: T[] = [];
         for (let file of info.fileList) {
             const text = (FILETYPE === FileTypes.TEXT) && await readTxtContent(file.originFileObj as unknown as File);
             (file as any)["content"] = text || '';
-            dataList.push({ ...file, id: file.uid, fileName: file.name, blobUrl: undefined, status: "active" } as unknown as TableDataType)
+            let covBlobUrl = undefined;
+            // 判断文件类型，File 转 BlobUrl 
+            if(FILETYPE?.split(',').includes("audio/wav") || FILETYPE?.split(',').includes("audio/mp3")){
+                covBlobUrl = URL.createObjectURL(file.originFileObj as File)
+            }
+            dataList.push({ ...file, id: file.uid, fileName: file.name, blobUrl: covBlobUrl, status: "active" } as unknown as T)
         }
-        props.setTableData(dataList)
+        props.tableData.forEach(item => {
+            dataList.forEach(keys => {
+                if(item.id !== keys.id && item.blobUrl ){
+                    URL.revokeObjectURL(item.blobUrl)
+                }
+            })
+        })
+
+        props.setTableData(dataList);
         setFileList(info.fileList)
     }
 

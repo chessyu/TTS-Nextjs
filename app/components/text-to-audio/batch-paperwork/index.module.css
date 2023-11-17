@@ -1,0 +1,14 @@
+.continar{
+    display: flex;
+    gap: 15px;
+}
+
+.uploader-box{
+    padding-bottom: 15px;
+    flex: 1;
+}
+
+.config{
+    width: 340px;
+    padding: 20px;
+}

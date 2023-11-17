@@ -97,11 +97,11 @@ function ConfigPage() {
                             description={<>
                                 <Row justify="space-evenly">
                                     <Col span={8}><span>语言: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getStyleRoleName(item.data.language)}</i></span></Col>
-                                    <Col span={8}><span>语音: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getVoiceName(item.data.language, item.data.voiceName)}</i></span></Col>
-                                    <Col span={8}><span>风格: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getStyleRoleName(item.data.styleName!)}</i></span></Col>
+                                    <Col span={8}><span>语音: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getVoiceName(item.data.language, item.data.voice)}</i></span></Col>
+                                    <Col span={8}><span>风格: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getStyleRoleName(item.data.style!)}</i></span></Col>
                                 </Row>
                                 <Row justify="space-evenly">
-                                    <Col span={8}><span>角色: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getStyleRoleName(item.data.roleName!)}</i></span></Col>
+                                    <Col span={8}><span>角色: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{getStyleRoleName(item.data.role!)}</i></span></Col>
                                     <Col span={8}><span>语速: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{item.data.speed}</i></span></Col>
                                     <Col span={8}><span>音调: <i style={{fontStyle:"normal", color:'#000', fontSize:13}}>{item.data.tone}</i></span></Col>
                                 </Row>

@@ -38,8 +38,8 @@ export const SSMLLable = (params: SpeechConfigType) => {
         <speak xmlns="http://www.w3.org/2001/10/synthesis"
             xmlns:mstts="http://www.w3.org/2001/mstts"
             xmlns:emo="http://www.w3.org/2009/10/emotionml" version="1.0" xml:lang="${params.language}">
-            <voice name="${params.voiceName}">
-                <mstts:express-as style="${params.styleName}" role="${params.roleName}">
+            <voice name="${params.voice}">
+                <mstts:express-as style="${params.style}" role="${params.role}">
                     <prosody rate="${params.speed >= 1 ? `+${rate}%` : `${rate}%`}" pitch="${params.tone >= 1 ? `+${pitch}%` : `${pitch}%`}">
                         ${params.text}
                     </prosody>

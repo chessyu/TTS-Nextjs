@@ -16,12 +16,11 @@ const textToSpeech = async (params: SpeechConfigType) => {
 
     speechConfig.speechSynthesisOutputFormat = params.quality;
 
-    let audio_config = undefined;
-    if (params.playDefault) {
-        audio_config = sdk.AudioConfig.fromDefaultSpeakerOutput();
-    }
+    const player = new sdk.SpeakerAudioDestination();
 
-    let synthesizer: SpeechSynthesizer | null = new sdk.SpeechSynthesizer(speechConfig, audio_config);
+    const audioConfig = sdk.AudioConfig.fromSpeakerOutput(player);
+
+    let synthesizer: SpeechSynthesizer | null = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
 
     const completeCb = (result: any, resolve: (value: Buffer) => void, reject: (err?: any) => void) => {
         if (result.reason === sdk.ResultReason.SynthesizingAudioCompleted) {
@@ -42,6 +41,7 @@ const textToSpeech = async (params: SpeechConfigType) => {
     return new Promise<any>((resolve, reject) => {
         console.log("生成的 SMML: ")
         console.log(SSMLLable(params))
+        if(!params.playDefault) player.pause();
         synthesizer!.speakSsmlAsync(SSMLLable(params), (result: any) => completeCb(result, resolve, reject),(err:string) => errCb(err, reject))
     })
 }
