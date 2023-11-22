@@ -39,8 +39,7 @@ const textToSpeech = async (params: SpeechConfigType) => {
     }
 
     return new Promise<any>((resolve, reject) => {
-        console.log("生成的 SMML: ")
-        console.log(SSMLLable(params))
+
         if(!params.playDefault) player.pause();
         synthesizer!.speakSsmlAsync(SSMLLable(params), (result: any) => completeCb(result, resolve, reject),(err:string) => errCb(err, reject))
     })

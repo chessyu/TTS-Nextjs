@@ -1,5 +1,5 @@
 import { Button, Checkbox, Form, Input, Modal, message } from 'antd'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { ModalProps } from 'antd/lib';
 import styles from './login.module.css'
@@ -19,7 +19,7 @@ type RegistDataType = {
 function Login(props: LoginPropsType) {
   const [form] = Form.useForm();
   const [isLogin, setIsLogin] = useState(true)
-  const { login, register } = useUserService();
+  const { login, register, verify } = useUserService();
 console.log("RRRRRRRRRRR", userStore.getState())
   const onFinish = async (values: RegistDataType) => {
     // console.log("WWWWWW",values)
@@ -51,6 +51,25 @@ console.log("RRRRRRRRRRR", userStore.getState())
 
   const checkRegist = () => {
     setIsLogin(!isLogin)
+  }
+
+  const Verify = () => {
+    // const [svg, setSvg] = useState("")
+    // const getInitVerify = async () => {
+    //   try{
+    //     const data = await verify();
+    //     debugger
+    //   }catch(error){
+    //     console.error("error", error)
+    //   }
+    // }
+
+    // useEffect(() => {
+    //   getInitVerify();
+    // },[])
+
+
+    // return <div dangerouslySetInnerHTML={{__html: "" }}></div>
   }
 
   return (
@@ -108,6 +127,15 @@ console.log("RRRRRRRRRRR", userStore.getState())
             </Form.Item>
           )
         }
+        {/* <Form.Item name="verify" label="验证码" rules={[
+          { required: true, message: '验证码是必填项!' },
+          { len: 4, message: "验证码位数不正确"}
+        ]}>
+          <Input
+            placeholder="请输入验证码"
+            suffix={<Verify />}
+          />
+        </Form.Item> */}
 
         <Form.Item>
           <Form.Item name="remember" valuePropName="checked" noStyle>

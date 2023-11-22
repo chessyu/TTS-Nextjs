@@ -13,7 +13,7 @@ export type SsmlConfigRef = {
     getInnerText: () => string | undefined;
 }
 
-const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig}: SsmlConfigPageProps, ref: ForwardedRef<SsmlConfigRef>) => {
+const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig }: SsmlConfigPageProps, ref: ForwardedRef<SsmlConfigRef>) => {
     const divAreaRef = useRef<HTMLTextAreaElement & HTMLDivElement>(null);
     const [ssmlText, setSsmlText] = useState<SSMLTextType[]>([]);
     const actionRef = useRef({
@@ -67,9 +67,9 @@ const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig}: SsmlConfigP
     const appendChildForSpan = (text: string, substring: string) => {
         const array = text.split(substring);
         return `
-            ${array[0] && "<span>" + array[0] + "</span>"}
-            <span class=${styles['text-selection']}>${substring}</span>
-            ${array[1] && "<span>" + array[1] + "</span>"}
+            ${array[0] && "<span class='selection' data-type='text-node' >" + array[0] + "</span>"}
+            <span class='${styles['text-selection']} selection'  data-type='text-node'>${substring}</span>
+            ${array[1] && "<span class='selection'  data-type='text-node'>" + array[1] + "</span>"}
         `
     }
 
@@ -78,9 +78,11 @@ const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig}: SsmlConfigP
         event.preventDefault()
         const selection = window.getSelection();
         const selectionText = selection?.toString();
- 
+        const startNode = deepUpGetParentNode(selection?.anchorNode?.parentElement, 'tableItem')
+        const endNode = deepUpGetParentNode(selection?.focusNode?.parentElement, 'tableItem')
+
         if ((selectionText?.trim())) { // 有划词
-            if ((selection?.anchorNode as Text).data === (selection?.focusNode as Text).data) {
+            if (startNode === endNode) { // 单行内的选取文字
                 if (selection && selection.anchorNode && selection.anchorNode.parentElement) {
                     const textData = (selection.anchorNode as Text).data
                     selection.anchorNode.parentElement.innerHTML = appendChildForSpan(textData, selectionText)
@@ -88,8 +90,6 @@ const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig}: SsmlConfigP
                     setItemConfig && setItemConfig([nodeAttr]);
                 }
             } else {
-                const startNode = deepUpGetParentNode(selection?.anchorNode?.parentElement, 'tableItem')
-                const endNode = deepUpGetParentNode(selection?.focusNode?.parentElement, 'tableItem')
                 const startNodeIndex: number = [].indexOf.call(startNode?.parentElement?.childNodes, startNode as never)
                 const endNodeIndex: number = [].indexOf.call(startNode?.parentElement?.childNodes, endNode as never)
                 let array = [startNodeIndex, endNodeIndex];
@@ -132,7 +132,7 @@ const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig}: SsmlConfigP
 
             }
         } else {//没有划词
-            const nodeAttr = getNodeAttrData(selection!.anchorNode!.parentElement as HTMLElement, {start: selection?.anchorOffset!, end: selection?.focusOffset!});
+            const nodeAttr = getNodeAttrData(selection!.anchorNode!.parentElement as HTMLElement, { start: selection?.anchorOffset!, end: selection?.focusOffset! });
             setItemConfig && setItemConfig([nodeAttr]);
         }
     }
@@ -235,16 +235,18 @@ const SsmlConfigPage = forwardRef(({ setItemConfig, saveItemConfig}: SsmlConfigP
     const setConfigToHtml = (data: SSMLTextType[]) => {
         // setLoading(true);
         data.forEach(item => {
-            const fragment = new DocumentFragment();
             const currentNode = item.elementNode;
             let str = ``
-            
+
             // 停顿
             if (item.stop) {
-                
-                // str += `
-                //     <span class="${styles['stop']}" data-content=${item.stopName} ></span>
-                // `
+                if (item.selection?.start === item.selection?.end) {
+                    str += `
+                        ${item.textNode.substring(0, item.selection?.start || 0)}
+                        <span class="${styles['stop']}" data-content=${item.stopName} data-value=${item.stop} ></span>
+                        ${item.textNode.substring(item.selection?.end || 0)}
+                    `
+                }
             }
             if (item.pronunciation) {
 

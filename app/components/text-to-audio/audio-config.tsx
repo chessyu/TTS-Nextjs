@@ -283,8 +283,9 @@ function AudioConfig(props: AudioConfigPropsType) {
           }
         }
         setIsDisable({ ...isDisable, ...disable })
+        return
       }
-      return
+      
     } else {
       setIsDisable(initialDisable);
     }
@@ -303,7 +304,7 @@ function AudioConfig(props: AudioConfigPropsType) {
             options={voiceList?.map((item) => ({
               ...item,
               label: (<div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>{item.label + `${item.Gender === 'Female' ? " (女性)" : " (男性)"}`}</span>
+                <span>{item.label + `${item.Gender === 'Female' ? "👧🏻 (女声)" : "👦🏻 (男声)"}`}</span>
                 <span style={{ padding: "0 5px" }} onClick={(e) => payAudio(e, item)}> <PlayCircleOutlined style={{ color: '#3c8308' }} /> </span>
               </div>)
             }))}
@@ -327,7 +328,7 @@ function AudioConfig(props: AudioConfigPropsType) {
         <Form.Item label="角色" name="role" >
           <Select options={roleList} onChange={(newValue, options) => {
             if (!(options instanceof Array)) {
-              form.setFieldValue("styleName", options.label)
+              form.setFieldValue("roleName", options.label)
             }
             if (props.buttonType !== AudioBtnConfig.SYNTHESIS) return;
             update(config => config.role = newValue)

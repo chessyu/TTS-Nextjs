@@ -1,16 +1,19 @@
 import { characterRecognitionModel } from "@/_server/characterRecognitionModel"
 import { REQUESTERR, RESPONSEOK } from "@/constant"
+import { SpeechToTextType } from "@/interface"
+import { useFetch } from "./use-fetch"
 
 type UseVideoToTextProps = {
-    videoRecognizer: (params: any) => Promise<any>
+    videoRecognizer: (params: SpeechToTextType) => Promise<any>
 
 }
 
 export const useVideoToText = (): UseVideoToTextProps => {
+    const fetch = useFetch();
     
-    const videoRecognizer = async (stream: any) => {
+    const videoRecognizer = async (data: SpeechToTextType) => {
         try{
-            const result = await characterRecognitionModel.charachterForAudio({stream})
+            const result = await characterRecognitionModel.charachterForAudio(data)
             return Promise.resolve({
                 ...RESPONSEOK,
                 data: result
@@ -18,10 +21,9 @@ export const useVideoToText = (): UseVideoToTextProps => {
         }catch(error:any) {
             return Promise.resolve({ ...REQUESTERR, message: '调用SDK失败：' + error })
         }
-        
     }
 
     return {
-        videoRecognizer
+        videoRecognizer,
     }
 }

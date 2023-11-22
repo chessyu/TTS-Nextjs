@@ -27,9 +27,9 @@ export default function Home({ childrenList }: { childrenList?: IRouteItemTypes[
                                 onTabChange(value, () => navigate(value))
                             }}
                             items={childrenList as TabsProps["items"]}
-                            tabBarExtraContent={{
-                                right: <Button type="link" onClick={() =>  setOpen(true)}>登录</Button>
-                            }}
+                            // tabBarExtraContent={{
+                            //     right: <Button type="link" onClick={() =>  setOpen(true)}>登录</Button>
+                            // }}
                         />
                     </div>
                     <div className={styles.view}>
@@ -37,7 +37,7 @@ export default function Home({ childrenList }: { childrenList?: IRouteItemTypes[
                     </div>
                 </div>
             </main>
-            <Login open={open} title="登录" width={450} onCancel={() => {setOpen(false)}} footer={null} />
+            {/* <Login open={open} title="登录" width={450} onCancel={() => {setOpen(false)}} footer={null} /> */}
         </ConfigProvider>
     )
 }

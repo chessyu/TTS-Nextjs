@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 
 export const paramsValidateMiddleware = async (req: NextRequest, schema: Joi.ObjectSchema) => {
     if(!schema) return;
-    console.log("第四步执行 paramsValidateMiddleware 全局中间件")
+
     const options = {
         abortEarly: false, // include all errors
         allowUnknown: true, // ignore unknown props

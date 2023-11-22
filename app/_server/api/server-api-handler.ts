@@ -7,7 +7,7 @@ import { paramsValidateMiddleware } from "./params-validate-middleware";
 export function serverApiHandler (handler: any) {
     const warppendHandle: any = {}
     const httpMethods = ["GET", "POST", "PUT", "DELETE"];
-    console.log("第二步执行 serverApiHandler 公共方法", handler)
+
 
     httpMethods.forEach( method => {
         if(typeof handler[method] !== 'function') return;

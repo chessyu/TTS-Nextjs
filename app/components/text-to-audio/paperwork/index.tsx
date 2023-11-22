@@ -21,7 +21,7 @@ function Paperwork(props: any) {
 
   const segmentOption: SegmentedProps["options"] = useMemo(() => [
     { label: "自述", value: SSMLTYPE.TEXT, icon: "" },
-    { label: "场景对话", value: SSMLTYPE.SSML, icon: "" },
+    // { label: "场景对话", value: SSMLTYPE.SSML, icon: "" },
   ], [])
 
 
@@ -81,6 +81,7 @@ function Paperwork(props: any) {
               spellCheck={false}
               style={{ resize: "none" }}
               placeholder='请输入配音文案...'
+              maxLength={20000}
               ref={inputTextAreaRef}
               allowClear
               value={text}

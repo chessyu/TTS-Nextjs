@@ -11,9 +11,11 @@ export enum FileTypes {
 }
 
 
-/** 文本转语音类型 */
-export type TextToSpeechType = {
-
+/** 语音识别类型 调用 SDK 所需要的参数 */
+export type SpeechToTextType = {
+    stream: File | Buffer;
+    language: string;
+    phrases: string;
 }
 
 /** 文本合成语音时 调用 SDK 所需的参数 */

@@ -7,18 +7,19 @@
 }
 .continar{
     min-width: 750px;
-    min-height: 500px;
+    min-height: 600px;
     max-width: 1200px;
     overflow: hidden;
     box-sizing: border-box;
     width: var(--max-width);
     height: var(--max-heigth);
-    border: var(--border);
+    /* border: var(--border); */
     border-radius: 20px;
-    box-shadow: 5px 5px 20px #e1e1e1;
+    box-shadow: 5px 5px 20px #e3eeff;
     display: flex;
     flex-direction: column;
     padding: 0 0 10px 0;
+    background-color: #fff;
 }
 
 .menu{

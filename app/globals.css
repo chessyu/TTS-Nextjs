@@ -53,9 +53,11 @@ body {
 }
 
 body {
-  background: linear-gradient(-45deg,  var(--background-start-rgb), var(--background-end-rgb));
+  background: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
   background-size: 600% 600%;
-  animation: gradientBG 60s ease infinite;
+  animation: gradientBG 5s ease infinite;
+  
+  /* background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%); */
 }
 @keyframes gradientBG {
   0% {

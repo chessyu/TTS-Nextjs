@@ -102,17 +102,17 @@ export const routers: IRouteItemTypes[] = [
 
                 ]
             },
-            {
-                label: "视频",
-                key: "video",
-                Component: dynamic(async () => (await import(/* webpackChunkName: "video" */ "@/components/video")), {
-                    loading: () => (<Loading />),
-                    ssr: false
-                }),
-                childrenList: [
+            // {
+            //     label: "视频",
+            //     key: "video",
+            //     Component: dynamic(async () => (await import(/* webpackChunkName: "video" */ "@/components/video")), {
+            //         loading: () => (<Loading />),
+            //         ssr: false
+            //     }),
+            //     childrenList: [
 
-                ]
-            },
+            //     ]
+            // },
         ]
     },
 ]

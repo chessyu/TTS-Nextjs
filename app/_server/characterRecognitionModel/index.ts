@@ -1,3 +1,4 @@
+import { SpeechToTextType } from "@/interface";
 import * as sdk from "microsoft-cognitiveservices-speech-sdk";
 
 const SPEECH_KEY = process.env.NEXT_PUBLIC_SPEECH_KEY;
@@ -10,9 +11,9 @@ const charachterForImage = () => {
 }
 
 /** 音频识别文字 */
-const charachterForAudio = async (params: any) =>
-    new Promise<any>((resolve, reject) => {
-
+const charachterForAudio = async (params: SpeechToTextType) =>
+    new Promise<string>((resolve, reject) => {
+        let result = "";
         const autoDetectSourceLanguageConfig = sdk.AutoDetectSourceLanguageConfig.fromLanguages(["en-US", "zh-CN"]);
 
         const speechConfig = sdk.SpeechConfig.fromSubscription(SPEECH_KEY!, SPEECH_REGION!)
@@ -20,32 +21,29 @@ const charachterForAudio = async (params: any) =>
         speechConfig.setProfanity(sdk.ProfanityOption.Masked);
         speechConfig.setProperty("SpeechServiceResponse_PostProcessingOption", "TrueText");
         speechConfig.setProperty(sdk.PropertyId.SpeechServiceResponse_RequestSentenceBoundary, "true");
-        speechConfig.speechRecognitionLanguage = "zh-CN";
-
-        // speechConfig.speechRecognitionLanguage = "en-US";
-        // const audioConfig = sdk.AudioConfig.fromStreamInput(params.stream);
+        speechConfig.speechRecognitionLanguage = params.language;
 
         const audioConfig = sdk.AudioConfig.fromWavFileInput(params.stream);
 
         const speechRecognizer = sdk.SpeechRecognizer.FromConfig(speechConfig, autoDetectSourceLanguageConfig, audioConfig);
-
+        if(params.phrases.trim()){
+            const phraseListGrammar = sdk.PhraseListGrammar.fromRecognizer(speechRecognizer);
+            phraseListGrammar.addPhrases(params.phrases.split(";"));
+        }
 
         /** 识别 */
         speechRecognizer.recognizing = (s, e) => {
-            console.log(`正在识别: Text=${e.result.text}`);
             if (sdk.ResultReason.RecognizingSpeech === e.result.reason && e.result.text.length) {
-                console.log("识别方法触发", e.result.text);
+
             } else {
-                console.log("无法识别该音频");
+                reject("无法识别该音频")
             }
         }
 
         /** 识别完成 */
         speechRecognizer.recognized = (s, e) => {
-            console.log("识别完成", e.result.text)
             if (sdk.ResultReason.RecognizedSpeech == e.result.reason && e.result.text.length > 0) {
-                console.log("完成👌🏼识别", e.result.text);
-                resolve(e.result.text)
+                result += e.result.text;
             } else {
                 console.log("识别完成:  无法识别该音频", e);
             }
@@ -70,8 +68,7 @@ const charachterForAudio = async (params: any) =>
 
         /** 会话停止 */
         speechRecognizer.sessionStopped = (s, e) => {
-            console.log('会话停止识别接口:', s, e.sessionId);
-            reject("无法识别该音频")
+            resolve(result)
             speechRecognizer.stopContinuousRecognitionAsync();
         }
         /** 开始连续识别 */

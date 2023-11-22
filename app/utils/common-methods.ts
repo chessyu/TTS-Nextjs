@@ -35,6 +35,30 @@ export const downloadAudioFile = (src: string, fileName: string) => {
     }
 }
 
+/**
+ * @fileoverview 提供文本（如JSON），使用JavaScript创建文件并下载文件
+ * @author AcWrong
+ * @param {string} textTowrite 
+ * @param {string} fileNameToSaveAs 
+ * @param {string} fileType 
+ */
+export const saveTextAsFile = (textTowrite: string, fileNameToSaveAs: string, fileType: string) => {
+    //提供文本和文件类型用于创建一个Blob对象
+    let textFileAsBlob = new Blob([textTowrite], { type: fileType });
+    //创建一个 a 元素
+    let downloadLink = document.createElement('a');
+
+    //指定下载过程中显示的文件名
+    downloadLink.download = fileNameToSaveAs;
+    downloadLink.innerHTML = 'Download File';
+    downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+    downloadLink.style.display = 'none';
+    document.body.appendChild(downloadLink);
+
+    //模式鼠标左键单击事件
+    downloadLink.click();
+}
+
 /** 文案进行分片 */
 export const splitText = (text: string, length = 400) => {
     const punctuation = [",", ".", "...", "?", "!", "，", "。", "？", "！", "”", "\n"];
@@ -185,12 +209,20 @@ function floatTo16BitPCM(output: DataView, offset: number, input: Float32Array) 
 }
 
 /** 递归的去修改某些数据 */
-export const deepEditAttrs = (maps: any[] = [], objs: (item:any) => any) => {
-    if(maps instanceof Array){
+export const deepEditAttrs = (maps: any[] = [], objs: (item: any) => any) => {
+    if (maps instanceof Array) {
         maps.forEach((keys) => {
-            keys = {...keys, ...objs(keys)};
-            if(keys.childList && keys.childList.length) deepEditAttrs(keys.childList, objs);
+            keys = { ...keys, ...objs(keys) };
+            if (keys.childList && keys.childList.length) deepEditAttrs(keys.childList, objs);
         })
         return maps;
     }
 }
+
+// 从一串字符中取出网址
+export const extractUrlFromString = (input: string): string | null => {
+    const urlRegex = /https?:\/\/[^\s]+/;
+    const match = input.match(urlRegex);
+    return match ? match[0] : null;
+  }
+  
