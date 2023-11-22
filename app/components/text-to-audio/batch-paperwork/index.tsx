@@ -112,7 +112,8 @@ function BatchPaperwork(props: any) {
       resolve(undefined);
     })
     for (const item of selectedRow) {
-      const result = await plainText({ ...getSpeechParams(), text: item.content });
+      debugger
+      const result = await plainText({ ...getSpeechParams(), text: item.content, ...item.audioConf });
       if (result.status === 200) {
         message.success(item.fileName + "生成配音成功!");
         await asyncWriteTableData(item.id, { blobUrl: result.data, status: "success" })
